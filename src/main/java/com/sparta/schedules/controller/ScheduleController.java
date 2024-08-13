@@ -29,11 +29,20 @@ public class ScheduleController {
         return scheduleResponseDto;
 
     }
+//    전체조회
+//    @GetMapping("/todo/{id}")
+//    public List<ScheduleResponseDto> getSchedule(@PathVariable Long id) {
+//        List<ScheduleResponseDto> responseList = scheduleList.values().stream().map(ScheduleResponseDto::new).toList();
+//        return  responseList;
+//    }
 
     @GetMapping("/todo/{id}")
-    public List<ScheduleResponseDto> getSchedule() {
-        List<ScheduleResponseDto> responseList = scheduleList.values().stream().map(ScheduleResponseDto::new).toList();
-        return  responseList;
+    public ScheduleResponseDto getSchedule(@PathVariable Long id) {
+        if (scheduleList.containsKey(id)) {
+            Schedules schedules = scheduleList.get(id);
+            return new ScheduleResponseDto(schedules);
+        } else {
+            throw new IllegalArgumentException("선택한 일정이 존재하지 않습니다.");
+        }
     }
-
 }
