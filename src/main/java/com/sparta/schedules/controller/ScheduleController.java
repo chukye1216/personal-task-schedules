@@ -29,18 +29,43 @@ public class ScheduleController {
         return scheduleResponseDto;
 
     }
-//    전체조회
-//    @GetMapping("/todo/{id}")
-//    public List<ScheduleResponseDto> getSchedule(@PathVariable Long id) {
-//        List<ScheduleResponseDto> responseList = scheduleList.values().stream().map(ScheduleResponseDto::new).toList();
-//        return  responseList;
-//    }
+
+
+    @GetMapping("/todo")
+    public List<ScheduleResponseDto> getSchedule() {
+        List<ScheduleResponseDto> responseList = scheduleList.values().stream().map(ScheduleResponseDto::new).toList();
+        return responseList;
+    }
+
 
     @GetMapping("/todo/{id}")
     public ScheduleResponseDto getSchedule(@PathVariable Long id) {
         if (scheduleList.containsKey(id)) {
             Schedules schedules = scheduleList.get(id);
             return new ScheduleResponseDto(schedules);
+        } else {
+            throw new IllegalArgumentException("선택한 일정이 존재하지 않습니다.");
+        }
+    }
+
+    @PutMapping("/todo/{id}")
+    public Long updateSchedul(@PathVariable Long id, @RequestBody ScheduleRequestDto requestDto) {
+        if (scheduleList.containsKey(id)) {
+            Schedules schedules = scheduleList.get(id);
+
+            schedules.update(requestDto);
+
+            return schedules.getId();
+        } else {
+            throw new IllegalArgumentException("선택한 일정이 존재하지 않습니다.");
+        }
+    }
+
+    @DeleteMapping("/todo/{id}")
+    public Long deleteSchedules(@PathVariable Long id) {
+        if (scheduleList.containsKey(id)) {
+            scheduleList.remove(id);
+            return id;
         } else {
             throw new IllegalArgumentException("선택한 일정이 존재하지 않습니다.");
         }

@@ -21,4 +21,9 @@ public class Schedules {
         this.password = requestDto.getPassword();
         this.date = requestDto.getDate();
     }
+
+    public void update(ScheduleRequestDto requestDto) {
+        this.username = getUsername();
+        this.todo = getTodo();
+    }
 }
