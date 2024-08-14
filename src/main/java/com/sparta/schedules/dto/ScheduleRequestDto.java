@@ -6,6 +6,6 @@ public class ScheduleRequestDto {
     private Long id;
     private String username;
     private String todo;
-    private Integer password;
+    private String password;
     private String date;
 }
