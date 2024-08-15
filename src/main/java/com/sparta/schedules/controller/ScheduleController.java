@@ -4,11 +4,15 @@ import com.sparta.schedules.dto.ScheduleRequestDto;
 import com.sparta.schedules.dto.ScheduleResponseDto;
 import com.sparta.schedules.entity.Schedules;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.web.bind.annotation.*;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -55,7 +59,7 @@ public class ScheduleController {
     @GetMapping("/todo/{id}")
     public ScheduleResponseDto getSchedule(@PathVariable Long id) {
         String sql = "SELECT * FROM schedule WHERE id = ?";
-        Schedules schedule = jdbcTemplate.query(sql, resultSet->{
+        Schedules sch = jdbcTemplate.query(sql, resultSet->{
             if (resultSet.next()){
                 Schedules schedules = new Schedules();
                 schedules.setId(resultSet.getLong("id"));
@@ -68,11 +72,29 @@ public class ScheduleController {
                 return null;
             }
         }, id);
-        return new ScheduleResponseDto(schedule);
+        return new ScheduleResponseDto(sch);
+    }
+
+    @GetMapping("/todo")
+    public List<ScheduleResponseDto> getSchedules() {
+        // DB 조회
+        String sql = "SELECT * FROM schedule ORDER BY date DESC";
+
+        return jdbcTemplate.query(sql, new RowMapper<ScheduleResponseDto>() {
+            @Override
+            public ScheduleResponseDto mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Long id = rs.getLong("id");
+                String todo = rs.getString("todo");
+                String username = rs.getString("username");
+                String password = rs.getString("password");
+                String date = rs.getString("date");
+                return new ScheduleResponseDto(id, todo, username, password, date);
+            }
+        });
     }
 
     @PutMapping("/todo/{id}")
-    public Long updateSchedul(@PathVariable Long id, @RequestBody ScheduleRequestDto requestDto) {
+    public Long updateSchedule(@PathVariable Long id, @RequestBody ScheduleRequestDto requestDto) {
         Schedules schedules = findBYId(id);
         if (schedules != null) {
             String sql = "UPDATE schedules SET todo = ?, username = ?, password = ?, date =? WHERE id = ?";
